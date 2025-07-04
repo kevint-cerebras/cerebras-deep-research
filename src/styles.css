@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Lock scrolling */
+@layer base {
+  html, body {
+    @apply overflow-hidden h-screen;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-sm border border-gray-200/50;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  .search-input-focus {
+    @apply focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+} 
