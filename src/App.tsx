@@ -25,6 +25,55 @@ const App = () => {
   // Mobile sidebar state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
+  // Add touch handling for swipe gestures
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Handle touch start for swipe gestures
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  // Handle touch end for swipe gestures
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartX || !touchStartY) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const deltaX = touchStartX - touchEndX;
+    const deltaY = touchStartY - touchEndY;
+    
+    // Only close if it's a horizontal swipe (not vertical scroll)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 50) {
+      setIsMobileSidebarOpen(false);
+    }
+  };
+
+  // Close mobile sidebar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setIsMobileSidebarOpen(false);
+      }
+    };
+
+    if (isMobileSidebarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      // Prevent body scroll when sidebar is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileSidebarOpen]);
+  
   // BYOK - API Key Management
   const [exaApiKey, setExaApiKey] = useState('');
   const [cerebrasApiKey, setCerebrasApiKey] = useState('');
@@ -696,21 +745,23 @@ const App = () => {
   return (
     <div className="h-screen w-full relative bg-black overflow-hidden">
       {/* Animated Background Gradients */}
-      <div className="w-16 sm:w-24 md:w-32 lg:w-36 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[774.82px] right-[-30px] sm:right-[-100px] md:right-[-150px] lg:right-[-200px] top-[-50px] sm:top-[-70px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#2BFFFF]/25 to-[#1CA3A3]/0 blur-2xl" />
-      <div className="w-4 sm:w-6 md:w-8 lg:w-12 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[842.55px] right-[5px] sm:right-[10px] md:right-[-50px] lg:right-[-120px] top-[-100px] sm:top-[-143px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#2BFFFF]/30 to-[#1CA3A3]/0 blur-[20px]" />
-      <div className="w-16 sm:w-24 md:w-32 lg:w-36 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[842.55px] right-[100px] sm:right-[150px] md:right-[100px] lg:right-[60px] top-[-150px] sm:top-[-219.39px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#2BFFFF]/25 to-[#1CA3A3]/0 blur-2xl" />
-      <div className="w-[300px] sm:w-[400px] md:w-[500px] lg:w-[642.87px] h-[500px] sm:h-[700px] md:h-[800px] lg:h-[895.30px] left-[10%] sm:left-[15%] md:left-[30%] lg:left-[962.30px] top-[-100px] sm:top-[-186px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-br from-[#2BFFFF]/10 to-[#1CA3A3]/0 blur-3xl" />
+      <div className="w-16 sm:w-24 md:w-32 lg:w-36 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[774.82px] right-[-30px] sm:right-[-100px] md:right-[-150px] lg:right-[-200px] top-[-50px] sm:top-[-70px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#F05A28]/25 to-[#E04A18]/0 blur-2xl" />
+      <div className="w-4 sm:w-6 md:w-8 lg:w-12 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[842.55px] right-[5px] sm:right-[10px] md:right-[-50px] lg:right-[-120px] top-[-100px] sm:top-[-143px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#F05A28]/30 to-[#E04A18]/0 blur-[20px]" />
+      <div className="w-16 sm:w-24 md:w-32 lg:w-36 h-[400px] sm:h-[600px] md:h-[700px] lg:h-[842.55px] right-[100px] sm:right-[150px] md:right-[100px] lg:right-[60px] top-[-150px] sm:top-[-219.39px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-b from-[#F05A28]/25 to-[#E04A18]/0 blur-2xl" />
+      <div className="w-[300px] sm:w-[400px] md:w-[500px] lg:w-[642.87px] h-[500px] sm:h-[700px] md:h-[800px] lg:h-[895.30px] left-[10%] sm:left-[15%] md:left-[30%] lg:left-[962.30px] top-[-100px] sm:top-[-186px] absolute origin-top-left rotate-[25.32deg] bg-gradient-to-br from-[#F05A28]/10 to-[#E04A18]/0 blur-3xl" />
 
       {/* Navigation */}
       <div className="w-full px-4 sm:px-6 md:px-12 lg:px-24 py-3 md:py-4 left-0 top-0 absolute bg-white/0 border-b border-white/10 backdrop-blur-[50px] flex justify-between items-center overflow-hidden z-30">
         <div className="text-white/95 text-lg md:text-xl font-medium font-space-grotesk leading-tight">
-          Deep Research
+          Cerebras Deep Research
         </div>
         
         {/* Mobile menu button */}
         <button
           onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          className="md:hidden p-3 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-95"
+          aria-label={isMobileSidebarOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMobileSidebarOpen}
         >
           {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -725,48 +776,64 @@ const App = () => {
               </div>
             </div>
           )}
-          {apiKeysConfigured && (
+          {/* {apiKeysConfigured && (
             <div className="flex items-center gap-2 px-2 lg:px-3 py-1.5 bg-gradient-to-b from-green-500/20 to-green-600/10 rounded-lg border border-green-500/30">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <div className="text-green-300 text-xs font-medium font-space-grotesk">
                 API Keys Ready
               </div>
             </div>
-          )}
+          )} */}
         </div>
         
         {/* Invisible spacer for balance on desktop */}
         <div className="hidden md:block text-white/0 text-lg md:text-xl font-medium font-space-grotesk leading-tight">
-          Deep Research
+          Cerebras Deep Research
         </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileSidebarOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={() => setIsMobileSidebarOpen(false)}>
-          <div className="fixed right-0 top-0 h-full w-80 bg-gradient-to-br from-[#2BFFFF]/10 via-[#2BFFFF]/0 to-[#1CA3A3]/5 backdrop-blur-[20px] border-l border-white/20 z-50" onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-col h-full p-4">
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ease-in-out"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        >
+          <div 
+            ref={sidebarRef}
+            className="fixed right-0 top-0 h-full w-[85vw] max-w-sm bg-gradient-to-br from-[#F05A28]/15 via-[#F05A28]/5 to-[#E04A18]/10 backdrop-blur-[25px] border-l border-white/30 z-50 transform transition-transform duration-300 ease-in-out"
+            style={{
+              transform: isMobileSidebarOpen ? 'translateX(0)' : 'translateX(100%)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="flex flex-col h-full">
               {/* Mobile sidebar header */}
-              <div className="flex justify-between items-center mb-6 pt-16">
-                <h2 className="text-white text-xl font-medium font-space-grotesk">Menu</h2>
-                <button onClick={() => setIsMobileSidebarOpen(false)} className="p-2 text-white/70 hover:text-white">
+              <div className="flex justify-between items-center p-4 pt-20 border-b border-white/10">
+                <h2 className="text-white text-xl font-semibold font-space-grotesk">Menu</h2>
+                <button 
+                  onClick={() => setIsMobileSidebarOpen(false)} 
+                  className="p-2 text-white/70 hover:text-white transition-colors duration-200 active:scale-95"
+                  aria-label="Close menu"
+                >
                   <X className="w-6 h-6" />
                 </button>
               </div>
               
               {/* Mobile status indicator */}
-              <div className="mb-6">
+              <div className="p-4 border-b border-white/10">
                 {!apiKeysConfigured && (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-red-500/20 to-red-600/10 rounded-lg border border-red-500/30">
-                    <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-red-500/20 to-red-600/15 rounded-xl border border-red-500/30">
+                    <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse flex-shrink-0"></div>
                     <div className="text-red-300 text-sm font-medium font-space-grotesk">
                       Configure API Keys
                     </div>
                   </div>
                 )}
                 {apiKeysConfigured && (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-green-500/20 to-green-600/10 rounded-lg border border-green-500/30">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-500/20 to-green-600/15 rounded-xl border border-green-500/30">
+                    <div className="w-3 h-3 bg-green-400 rounded-full flex-shrink-0"></div>
                     <div className="text-green-300 text-sm font-medium font-space-grotesk">
                       API Keys Ready
                     </div>
@@ -775,54 +842,45 @@ const App = () => {
               </div>
               
               {/* Mobile tab navigation */}
-              <div className="flex flex-col gap-2 mb-6">
-                <button
-                  onClick={() => {
-                    setActiveTab('activity');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-lg text-left transition-all ${
-                    activeTab === 'activity' 
-                      ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <div className="font-medium font-space-grotesk">Activity</div>
-                  <div className="text-xs opacity-70">Research progress</div>
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('sources');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-lg text-left transition-all ${
-                    activeTab === 'sources' 
-                      ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <div className="font-medium font-space-grotesk">Sources</div>
-                  <div className="text-xs opacity-70">Found references</div>
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('settings');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-lg text-left transition-all ${
-                    activeTab === 'settings' 
-                      ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <div className="font-medium font-space-grotesk">Settings</div>
-                  <div className="text-xs opacity-70">API configuration</div>
-                </button>
+              <div className="p-4 border-b border-white/10">
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => setActiveTab('activity')}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium font-space-grotesk transition-all duration-200 active:scale-95 ${
+                      activeTab === 'activity' 
+                        ? 'bg-gradient-to-r from-[#F05A28]/25 to-[#E04A18]/15 text-orange-300 border border-orange-500/40' 
+                        : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent'
+                    }`}
+                  >
+                    Activity
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('sources')}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium font-space-grotesk transition-all duration-200 active:scale-95 ${
+                      activeTab === 'sources' 
+                        ? 'bg-gradient-to-r from-[#F05A28]/25 to-[#E04A18]/15 text-orange-300 border border-orange-500/40' 
+                        : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent'
+                    }`}
+                  >
+                    Sources
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('settings')}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium font-space-grotesk transition-all duration-200 active:scale-95 ${
+                      activeTab === 'settings' 
+                        ? 'bg-gradient-to-r from-[#F05A28]/25 to-[#E04A18]/15 text-orange-300 border border-orange-500/40' 
+                        : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent'
+                    }`}
+                  >
+                    Settings
+                  </button>
+                </div>
               </div>
               
               {/* Mobile sidebar content */}
-              <div className="flex-1 overflow-y-auto">
-                {/* Content will be rendered here based on activeTab */}
+              <div className="flex-1 overflow-y-auto p-4">
                 {activeTab === 'activity' && (
                   <div className="space-y-3">
                     {activityTabs.map((tab, index) => {
@@ -830,7 +888,7 @@ const App = () => {
                         if (status === 'failed') return 'text-red-300';
                         switch (type) {
                           case 'error': return 'text-red-300';
-                          case 'complete': return 'text-cyan-300';
+                          case 'complete': return 'text-orange-300';
                           case 'processing': return status === 'active' ? 'text-orange-300' : 'text-white';
                           default: return 'text-white';
                         }
@@ -854,7 +912,7 @@ const App = () => {
                       );
                     })}
                     {activityTabs.length === 0 && (
-                      <div className="p-3 bg-white/5 rounded-lg border border-white/5">
+                      <div className="p-3 bg-white/5 rounded-lg border border-white/10">
                         <div className="text-white/60 text-sm font-light font-space-grotesk">
                           No research activity yet
                         </div>
@@ -869,7 +927,7 @@ const App = () => {
                       (realtimeSources.length > 0 ? realtimeSources : researchResult!.all_sources).map((source: ResearchSource, index) => (
                         <div key={index} className="p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
                              onClick={() => window.open(source.url, '_blank')}>
-                          <div className="text-white text-sm font-medium font-space-grotesk mb-1 hover:text-cyan-300 transition-colors">
+                          <div className="text-white text-sm font-medium font-space-grotesk mb-1 hover:text-orange-300 transition-colors">
                             {source.title || 'Untitled Source'}
                           </div>
                           <div className="text-white/60 text-xs font-light font-space-grotesk">
@@ -897,7 +955,7 @@ const App = () => {
                           value={exaApiKey}
                           onChange={(e) => handleExaKeyChange(e.target.value)}
                           placeholder="Enter your Exa API key..."
-                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-l-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-400"
+                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-l-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-orange-400"
                         />
                         <button
                           onClick={() => setShowExaKey(!showExaKey)}
@@ -907,7 +965,7 @@ const App = () => {
                         </button>
                       </div>
                       <button 
-                        className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 underline"
+                        className="mt-2 text-xs text-orange-400 hover:text-orange-300 underline"
                         onClick={() => window.open('https://exa.ai/?utm_source=cerebras-research', '_blank')}
                       >
                         Get API Key →
@@ -922,7 +980,7 @@ const App = () => {
                           value={cerebrasApiKey}
                           onChange={(e) => handleCerebrasKeyChange(e.target.value)}
                           placeholder="Enter your Cerebras API key..."
-                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-l-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-400"
+                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-l-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-orange-400"
                         />
                         <button
                           onClick={() => setShowCerebrasKey(!showCerebrasKey)}
@@ -932,7 +990,7 @@ const App = () => {
                         </button>
                       </div>
                       <button 
-                        className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 underline"
+                        className="mt-2 text-xs text-orange-400 hover:text-orange-300 underline"
                         onClick={() => window.open('https://cloud.cerebras.ai?utm_source=deepresearchdemo', '_blank')}
                       >
                         Get API Key →
@@ -940,6 +998,13 @@ const App = () => {
                     </div>
                   </div>
                 )}
+              </div>
+              
+              {/* Mobile sidebar footer */}
+              <div className="p-4 border-t border-white/10">
+                <div className="text-center text-white/50 text-xs font-space-grotesk">
+                  Swipe right to close
+                </div>
               </div>
             </div>
           </div>
@@ -956,8 +1021,8 @@ const App = () => {
              {!hasSearched ? (
                <div className="flex-1 flex flex-col justify-center items-center gap-8 sm:gap-12 py-8 sm:py-12">
                  <div className="text-center space-y-4 sm:space-y-6">
-                   <div className="bg-gradient-to-b from-[#2BFFFF] to-[#1CA3A3] bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-space-grotesk leading-tight">
-                     Deep Research
+                   <div className="bg-gradient-to-b from-[#F05A28] to-[#E04A18] bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-space-grotesk leading-tight">
+                     Cerebras Deep Research
                    </div>
                    <div className="text-white/70 text-base sm:text-lg md:text-xl font-light font-space-grotesk leading-normal max-w-2xl">
                      AI-powered research that goes deeper than search
@@ -972,8 +1037,8 @@ const App = () => {
                        <div className="flex-1 text-white/95 text-sm sm:text-base font-light font-space-grotesk leading-tight group-hover:text-white transition-colors">
                          {question}
                        </div>
-                       <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/10 rounded-full flex justify-center items-center group-hover:bg-gradient-to-b group-hover:from-[#2BFFFF] group-hover:to-[#1CA3A3] transition-all flex-shrink-0">
-                         <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/80 group-hover:text-black transition-colors" />
+                       <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/10 rounded-full flex justify-center items-center group-hover:bg-gradient-to-b group-hover:from-[#F05A28] group-hover:to-[#E04A18] transition-all flex-shrink-0">
+                         <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/80 group-hover:text-white transition-colors" />
                        </div>
                      </div>
                    ))}
@@ -985,14 +1050,14 @@ const App = () => {
                    {/* Progress Bar */}
                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                      <div 
-                       className="h-full bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 transition-all duration-300 ease-out"
+                       className="h-full bg-gradient-to-r from-orange-400 via-red-500 to-orange-600 transition-all duration-300 ease-out"
                        style={{ width: `${progress}%` }}
                      />
                    </div>
                    
                    {/* Progress Info */}
                    <div className="text-center space-y-3">
-                     <div className="text-cyan-400 text-2xl sm:text-3xl font-bold font-space-grotesk">
+                     <div className="text-orange-400 text-2xl sm:text-3xl font-bold font-space-grotesk">
                        {progress}%
                      </div>
                      <div className="text-white/80 text-sm sm:text-base font-light font-space-grotesk max-w-2xl mx-auto">
@@ -1013,7 +1078,7 @@ const App = () => {
                  <div className="flex-1 space-y-4 sm:space-y-6 max-w-4xl mx-auto w-full">
                    {/* User query bubble */}
                    <div className="flex justify-end">
-                     <div className="bg-gradient-to-b from-[#2BFFFF] to-[#1CA3A3] text-black px-4 sm:px-6 py-3 sm:py-4 rounded-2xl max-w-[85%] sm:max-w-[80%] shadow-lg">
+                     <div className="bg-gradient-to-b from-[#F05A28] to-[#E04A18] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-2xl max-w-[85%] sm:max-w-[80%] shadow-lg">
                        <div className="text-sm sm:text-base font-medium font-space-grotesk">
                          {currentSearch}
                        </div>
@@ -1099,7 +1164,7 @@ const App = () => {
            </div>
 
            {/* Desktop Sidebar */}
-           <div className="hidden md:block fixed right-0 top-16 md:top-20 bottom-0 w-80 lg:w-96 bg-gradient-to-br from-[#2BFFFF]/10 via-[#2BFFFF]/0 to-[#1CA3A3]/5 backdrop-blur-[20px] border-l border-white/20 z-20">
+           <div className="hidden md:block fixed right-0 top-16 md:top-20 bottom-0 w-80 lg:w-96 bg-gradient-to-br from-[#F05A28]/10 via-[#F05A28]/0 to-[#E04A18]/5 backdrop-blur-[20px] border-l border-white/20 z-20">
              <div className="flex flex-col h-full p-4 lg:p-6">
                {/* Desktop tab navigation */}
                <div className="flex justify-center items-center mb-6">
@@ -1108,7 +1173,7 @@ const App = () => {
                      onClick={() => setActiveTab('activity')}
                      className={`px-3 lg:px-4 py-2 rounded-md text-sm font-medium font-space-grotesk transition-all ${
                        activeTab === 'activity' 
-                         ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
+                         ? 'bg-gradient-to-r from-[#F05A28]/20 to-[#E04A18]/10 text-orange-300 border border-orange-500/30' 
                          : 'text-white/70 hover:text-white hover:bg-white/5'
                      }`}
                    >
@@ -1118,7 +1183,7 @@ const App = () => {
                      onClick={() => setActiveTab('sources')}
                      className={`px-3 lg:px-4 py-2 rounded-md text-sm font-medium font-space-grotesk transition-all ${
                        activeTab === 'sources' 
-                         ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
+                         ? 'bg-gradient-to-r from-[#F05A28]/20 to-[#E04A18]/10 text-orange-300 border border-orange-500/30' 
                          : 'text-white/70 hover:text-white hover:bg-white/5'
                      }`}
                    >
@@ -1128,7 +1193,7 @@ const App = () => {
                      onClick={() => setActiveTab('settings')}
                      className={`px-3 lg:px-4 py-2 rounded-md text-sm font-medium font-space-grotesk transition-all ${
                        activeTab === 'settings' 
-                         ? 'bg-gradient-to-r from-[#2BFFFF]/20 to-[#1CA3A3]/10 text-cyan-300 border border-cyan-500/30' 
+                         ? 'bg-gradient-to-r from-[#F05A28]/20 to-[#E04A18]/10 text-orange-300 border border-orange-500/30' 
                          : 'text-white/70 hover:text-white hover:bg-white/5'
                      }`}
                    >
@@ -1158,7 +1223,7 @@ const App = () => {
                          if (status === 'failed') return 'text-red-300';
                          switch (type) {
                            case 'error': return 'text-red-300';
-                           case 'complete': return 'text-cyan-300';
+                           case 'complete': return 'text-orange-300';
                            case 'processing': return status === 'active' ? 'text-orange-300' : 'text-white';
                            default: return 'text-white';
                          }
@@ -1196,7 +1261,7 @@ const App = () => {
                                    <div className="flex items-center gap-2">
                                      <div className="flex-1 bg-white/20 rounded-full h-1">
                                        <div 
-                                         className="bg-gradient-to-r from-cyan-400 to-blue-400 h-1 rounded-full transition-all duration-300"
+                                         className="bg-gradient-to-r from-orange-400 to-red-400 h-1 rounded-full transition-all duration-300"
                                          style={{ width: `${tab.details.progress}%` }}
                                        ></div>
                                      </div>
@@ -1248,7 +1313,7 @@ const App = () => {
                          <div key={index} className="self-stretch px-3 py-2 relative bg-gradient-to-b from-white/10 to-white/0 rounded-lg shadow-[inset_0px_0px_8px_1px_rgba(255,255,255,0.25)] outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex justify-start items-start gap-2 overflow-hidden hover:from-white/15 transition-all cursor-pointer"
                               onClick={() => window.open(source.url, '_blank')}>
                            <div className="flex-1 inline-flex flex-col justify-start items-start gap-0.5">
-                             <div className="self-stretch justify-start text-white text-sm font-medium font-['Space_Grotesk'] leading-tight hover:text-cyan-300 transition-colors">
+                             <div className="self-stretch justify-start text-white text-sm font-medium font-['Space_Grotesk'] leading-tight hover:text-orange-300 transition-colors">
                                {source.title || 'Untitled Source'}
                              </div>
                              <div className="self-stretch justify-start text-white/60 text-xs font-light font-['Space_Grotesk'] leading-tight">
@@ -1288,24 +1353,24 @@ const App = () => {
                        <div className="w-full justify-start text-white text-base font-medium font-['Space_Grotesk'] leading-tight">API Keys</div>
                        
                        {/* API Keys Status */}
-                       <div className={`self-stretch px-3.5 py-3 rounded-xl shadow-[inset_0px_0px_10px_2px_rgba(255,255,255,0.32)] outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex justify-between items-center overflow-hidden ${
+                       {/* <div className={`self-stretch px-3.5 py-3 rounded-xl shadow-[inset_0px_0px_10px_2px_rgba(255,255,255,0.32)] outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex justify-between items-center overflow-hidden ${
                          apiKeysConfigured 
                            ? 'bg-gradient-to-b from-green-500/20 to-green-600/10' 
                            : 'bg-gradient-to-b from-red-500/20 to-red-600/10'
-                       }`}>
-                         <div className={`justify-start text-sm font-medium font-['Space_Grotesk'] leading-tight ${
+                       }`}> */}
+                         {/* <div className={`justify-start text-sm font-medium font-['Space_Grotesk'] leading-tight ${
                            apiKeysConfigured ? 'text-green-300' : 'text-red-300'
                          }`}>
-                           {apiKeysConfigured ? 'API Keys Configured ✓' : 'API Keys Required'}
-                         </div>
-                       </div>
+                           {/* {apiKeysConfigured ? 'API Keys Configured ✓' : 'API Keys Required'} */}
+                         {/* </div> */}
+                       {/* </div> */}
 
                        {/* Exa API Key */}
                        <div className="self-stretch flex flex-col justify-start items-start gap-2">
                          <div className="self-stretch inline-flex justify-between items-center">
                            <div className="flex-1 justify-start text-white text-sm font-light font-['Space_Grotesk'] leading-tight">Exa API Key</div>
                            <button 
-                             className="px-3 py-1.5 bg-gradient-to-r from-[#2BFFFF] to-[#1CA3A3] hover:from-[#40ffff] hover:to-[#22b5b5] rounded-lg outline outline-1 outline-cyan-400/50 hover:outline-cyan-300 text-black text-xs font-medium font-['Space_Grotesk'] transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
+                             className="px-3 py-1.5 bg-gradient-to-r from-[#F05A28] to-[#E04A18] hover:from-[#FF6A38] hover:to-[#F05A28] rounded-lg outline outline-1 outline-orange-400/50 hover:outline-orange-300 text-white text-xs font-medium font-['Space_Grotesk'] transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
                              onClick={() => window.open('https://exa.ai/?utm_source=cerebras-research', '_blank')}
                            >
                              Get API Key →
@@ -1333,7 +1398,7 @@ const App = () => {
                          <div className="self-stretch inline-flex justify-between items-center">
                            <div className="flex-1 justify-start text-white text-sm font-light font-['Space_Grotesk'] leading-tight">Cerebras API Key</div>
                            <button 
-                             className="px-3 py-1.5 bg-gradient-to-r from-[#2BFFFF] to-[#1CA3A3] hover:from-[#40ffff] hover:to-[#22b5b5] rounded-lg outline outline-1 outline-cyan-400/50 hover:outline-cyan-300 text-black text-xs font-medium font-['Space_Grotesk'] transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
+                             className="px-3 py-1.5 bg-gradient-to-r from-[#F05A28] to-[#E04A18] hover:from-[#FF6A38] hover:to-[#F05A28] rounded-lg outline outline-1 outline-orange-400/50 hover:outline-orange-300 text-white text-xs font-medium font-['Space_Grotesk'] transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
                              onClick={() => window.open('https://cloud.cerebras.ai?utm_source=deepresearchdemo', '_blank')}
                            >
                              Get API Key →
@@ -1358,18 +1423,18 @@ const App = () => {
                      </div>
 
                      {/* Model Usage Info */}
-                     <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                       <div className="w-full justify-start text-white text-base font-medium font-['Space_Grotesk'] leading-tight">Model Configuration</div>
+                     {/* <div className="self-stretch flex flex-col justify-start items-start gap-4"> */}
+                       {/* <div className="w-full justify-start text-white text-base font-medium font-['Space_Grotesk'] leading-tight">Model Configuration</div> */}
                        
-                       <div className="self-stretch px-3.5 py-3 rounded-xl shadow-[inset_0px_0px_10px_2px_rgba(255,255,255,0.32)] outline outline-1 outline-offset-[-1px] outline-white/10 bg-gradient-to-b from-blue-500/20 to-blue-600/10">
-                         <div className="text-blue-300 text-sm font-medium font-['Space_Grotesk'] leading-tight mb-2">
+                       {/* <div className="self-stretch px-3.5 py-3 rounded-xl shadow-[inset_0px_0px_10px_2px_rgba(255,255,255,0.32)] outline outline-1 outline-offset-[-1px] outline-white/10 bg-gradient-to-b from-blue-500/20 to-blue-600/10"> */}
+                         {/* <div className="text-blue-300 text-sm font-medium font-['Space_Grotesk'] leading-tight mb-2">
                            Intelligent Model Selection ✨
                          </div>
                          <div className="text-white/80 text-sm font-light font-['Space_Grotesk'] leading-normal">
                            The system automatically uses all available Cerebras models with intelligent cycling, rate limiting, and failover for optimal performance.
-                         </div>
-                       </div>
-                     </div>
+                         </div> */}
+                       {/* </div> */}
+                     {/* </div> */}
                    </div>
                  )}
                </div>
@@ -1382,7 +1447,7 @@ const App = () => {
            <div className="flex items-center gap-3 max-w-4xl mx-auto">
              <input
                type="text"
-               className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none focus:border-cyan-400 transition-colors"
+               className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none focus:border-orange-400 transition-colors"
                placeholder="What would you like to research?"
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
@@ -1392,7 +1457,7 @@ const App = () => {
                className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
                  isResearching 
                    ? 'bg-gray-600 cursor-not-allowed text-white' 
-                   : 'bg-gradient-to-r from-[#2BFFFF] to-[#1CA3A3] hover:from-[#40ffff] hover:to-[#22b5b5] text-black'
+                   : 'bg-gradient-to-r from-[#F05A28] to-[#E04A18] hover:from-[#FF6A38] hover:to-[#F05A28] text-white'
                }`}
                onClick={handleSearch}
                disabled={isResearching}
@@ -1403,7 +1468,7 @@ const App = () => {
                  <ArrowRight className="w-5 h-5" />
                )}
                <span className="hidden sm:inline">
-                 {isResearching ? 'Researching...' : 'Research'}
+                 {isResearching ? 'Researching...' : ''}
                </span>
              </button>
            </div>
@@ -1416,7 +1481,7 @@ const App = () => {
           <div className="bg-gradient-to-b from-white/15 to-white/5 rounded-2xl shadow-[inset_0px_0px_20px_4px_rgba(255,255,255,0.32)] outline outline-1 outline-offset-[-1px] outline-white/20 backdrop-blur-[20px] p-6 sm:p-8 max-w-lg mx-auto">
             <div className="text-center">
               <div className="text-white text-xl font-bold font-space-grotesk leading-tight mb-4">
-                🚀 Get Started with Deep Research
+                🚀 Get Started with Cerebras Deep Research
               </div>
               <div className="text-white/80 text-sm font-light font-space-grotesk leading-normal mb-6">
                 To use this AI research system, you'll need API keys from both services. Don't worry - both offer free tiers to get started!
@@ -1429,7 +1494,7 @@ const App = () => {
                     <div className="text-white/70 text-xs">Web search & content</div>
                   </div>
                   <button 
-                    className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#2BFFFF] to-[#1CA3A3] hover:from-[#40ffff] hover:to-[#22b5b5] rounded-lg text-black text-xs font-medium transition-all hover:scale-105"
+                    className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#F05A28] to-[#E04A18] hover:from-[#FF6A38] hover:to-[#F05A28] rounded-lg text-white text-xs font-medium transition-all hover:scale-105"
                     onClick={() => window.open('https://exa.ai/?utm_source=cerebras-research', '_blank')}
                   >
                     Get Free Key →
@@ -1442,7 +1507,7 @@ const App = () => {
                     <div className="text-white/70 text-xs">AI inference & analysis</div>
                   </div>
                   <button 
-                    className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#2BFFFF] to-[#1CA3A3] hover:from-[#40ffff] hover:to-[#22b5b5] rounded-lg text-black text-xs font-medium transition-all hover:scale-105"
+                    className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#F05A28] to-[#E04A18] hover:from-[#FF6A38] hover:to-[#F05A28] rounded-lg text-white text-xs font-medium transition-all hover:scale-105"
                     onClick={() => window.open('https://cloud.cerebras.ai?utm_source=deepresearchdemo', '_blank')}
                   >
                     Get Free Key →
@@ -1458,7 +1523,7 @@ const App = () => {
                   I'll Set This Up Later
                 </button>
                 <button 
-                  className="px-4 sm:px-6 py-3 bg-gradient-to-b from-[#2BFFFF] to-[#1CA3A3] rounded-lg shadow-[inset_0px_0px_2px_1px_rgba(255,255,255,0.25)] text-black text-sm font-medium font-space-grotesk leading-tight hover:from-[#40ffff] hover:to-[#22b5b5] transition-all"
+                  className="px-4 sm:px-6 py-3 bg-gradient-to-b from-[#F05A28] to-[#E04A18] rounded-lg shadow-[inset_0px_0px_2px_1px_rgba(255,255,255,0.25)] text-white text-sm font-medium font-space-grotesk leading-tight hover:from-[#FF6A38] hover:to-[#F05A28] transition-all"
                   onClick={() => {
                     setActiveTab('settings');
                     setShowApiKeyNotification(false);
@@ -1526,7 +1591,7 @@ const App = () => {
                 </button>
                 {!researchError?.includes('credits exhausted') && (
                   <button 
-                    className="px-4 sm:px-6 py-3 bg-gradient-to-b from-[#2BFFFF] to-[#1CA3A3] rounded-lg shadow-[inset_0px_0px_2px_1px_rgba(255,255,255,0.25)] text-black text-sm font-medium font-space-grotesk leading-tight hover:from-[#40ffff] hover:to-[#22b5b5] transition-all"
+                    className="px-4 sm:px-6 py-3 bg-gradient-to-b from-[#F05A28] to-[#E04A18] rounded-lg shadow-[inset_0px_0px_2px_1px_rgba(255,255,255,0.25)] text-white text-sm font-medium font-space-grotesk leading-tight hover:from-[#FF6A38] hover:to-[#F05A28] transition-all"
                     onClick={() => {
                       setShowTimeoutPopup(false);
                       setResearchError(null);
