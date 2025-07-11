@@ -1,0 +1,4 @@
+/api/exa/search https://api.exa.ai/search 200!
+/api/exa/contents https://api.exa.ai/contents 200!
+/api/cerebras/* https://api.cerebras.ai/:splat 200!
+/* /index.html 200 
