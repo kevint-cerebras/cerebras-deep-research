@@ -1,5 +1,9 @@
 [build]
-  publish = "public"
+  command = "yarn build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/*"
